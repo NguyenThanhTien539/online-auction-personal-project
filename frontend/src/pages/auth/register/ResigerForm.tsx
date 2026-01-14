@@ -1,13 +1,88 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
+import JustValidate from "just-validate";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const validator = new JustValidate("#register-form");
+    validator
+      .addField(
+        "#fullName",
+        [
+          { rule: "required", errorMessage: "Họ và tên không được để trống" },
+          {
+            rule: "minLength",
+            value: 3,
+            errorMessage: "Họ và tên phải có ít nhất 3 ký tự",
+          },
+          {
+            rule: "maxLength",
+            value: 50,
+            errorMessage: "Họ và tên không được vượt quá 50 ký tự",
+          },
+        ],
+        {
+          errorContainer: "#fullNameError",
+        }
+      )
+      .addField(
+        "#email",
+        [
+          { rule: "required", errorMessage: "Vui lòng nhập email!" },
+          { rule: "email", errorMessage: "Email không đúng định dạng!" },
+        ],
+        { errorContainer: "#emailError" }
+      )
+      .addField(
+        "#password",
+        [
+          { rule: "required", errorMessage: "Vui lòng nhập mật khẩu!" },
+          {
+            validator: (value: string) => value.length >= 8,
+            errorMessage: "Mật khẩu có ít nhất 8 kí tự",
+          },
+          {
+            validator: (value: string) => /[A-Z]/.test(value),
+            errorMessage: "Mật khẩu phải chứa ít nhất một chữ cái in hoa!",
+          },
+          {
+            validator: (value: string) => /[a-z]/.test(value),
+            errorMessage: "Mật khẩu phải chứa ít nhất một chữ cái thường!",
+          },
+          {
+            validator: (value: string) => /\d/.test(value),
+            errorMessage: "Mật khẩu phải chứa ít nhất một chữ số!",
+          },
+          {
+            validator: (value: string) => /[@$!%*?&]/.test(value),
+            errorMessage: "Mật khẩu phải chứa ít nhất một ký tự đặc biệt!",
+          },
+        ],
+        {
+          errorContainer: "#passwordError",
+        }
+      )
+      .addField(
+        "#terms",
+        [{ rule: "required", errorMessage: "Bạn phải đồng ý với điều khoản" }],
+        { errorContainer: "#termsError" }
+      )
+      .onSuccess((event: any) => {
+        event.preventDefault();
+        // Xử lý khi form hợp lệ và được submit
+        console.log("Form submitted");
+      });
+  }, []);
+
   return (
     <>
       <form
+        id="register-form"
         className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-xl border border-emerald-100
                     flex flex-col space-y-6"
       >
@@ -20,17 +95,25 @@ export default function RegisterForm() {
         {/* Form Fields */}
         <div className="space-y-4">
           {/* Họ và tên */}
-          <InputField
-            label="Họ và tên"
-            id="fullName"
-            placeholder="Nhập họ và tên"
-          />
-          {/* Số điện thoại/Email */}
-          <InputField
-            label="Số điện thoại/Email"
-            id="contact"
-            placeholder="Nhập số điện thoại hoặc email"
-          />
+          <div>
+            <InputField
+              label="Họ và tên"
+              id="fullName"
+              placeholder="Nhập họ và tên"
+            />
+            <div
+              id="fullNameError"
+              className="text-xs text-red-500 mt-1 font-medium"
+            ></div>
+          </div>
+          {/* Email */}
+          <div>
+            <InputField label="Email" id="email" placeholder="Nhập email" />
+            <div
+              id="emailError"
+              className="text-xs text-red-500 mt-1 font-medium"
+            ></div>
+          </div>
 
           {/* Mật khẩu */}
           <div>
@@ -39,6 +122,7 @@ export default function RegisterForm() {
             </label>
             <div className="relative">
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
                 className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent pr-12"
@@ -51,6 +135,10 @@ export default function RegisterForm() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            <div
+              id="passwordError"
+              className="text-xs text-red-500 mt-1 font-medium"
+            ></div>
           </div>
 
           {/* Nhập lại mật khẩu */}
@@ -60,6 +148,7 @@ export default function RegisterForm() {
             </label>
             <div className="relative">
               <input
+                id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
                 className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent pr-12"
@@ -74,23 +163,33 @@ export default function RegisterForm() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="terms"
-              className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500"
+          <div className="flex flex-col">
+            {/* Checkbox + label */}
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-600">
+                Tôi cam kết tuân thủ quyền và trách nhiệm của người tham gia đấu
+                giá, chính sách và mọi{" "}
+                <a
+                  href="#"
+                  className="text-green-600 hover:underline font-medium"
+                >
+                  Điều khoản dịch vụ
+                </a>{" "}
+                tại website đấu giá trực tuyến vna.vn
+              </label>
+            </div>
+
+            {/* Error */}
+            <div
+              id="termsError"
+              className="mt-1 text-xs text-red-500 font-medium"
             />
-            <label htmlFor="terms" className="text-sm text-gray-600">
-              Tôi cam kết tuân thủ quyền và trách nhiệm của người tham gia đấu
-              giá, chính sách và mọi{" "}
-              <a
-                href="#"
-                className="text-green-600 hover:underline font-medium"
-              >
-                Điều khoản dịch vụ
-              </a>{" "}
-              tại website đấu giá trực tuyến vna.vn
-            </label>
           </div>
         </div>
 

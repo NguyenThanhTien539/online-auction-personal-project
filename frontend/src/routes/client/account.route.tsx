@@ -1,4 +1,4 @@
-import RegisterPage from "@/pages/auth/RegisterPage";
+import RegisterPage from "@/pages/auth/register/RegisterPage";
 
 const accountRoute = {
   path: "/accounts/register",

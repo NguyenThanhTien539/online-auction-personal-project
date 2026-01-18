@@ -8,7 +8,7 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => { 
     const validator = new JustValidate("#register-form");
     validator
       .addField(
@@ -204,7 +204,7 @@ export default function RegisterForm() {
         <div className="text-center text-sm text-gray-600">
           Đã có tài khoản?{" "}
           <a
-            href="/login"
+            href="/accounts/login"
             className="text-green-600 hover:underline font-medium"
           >
             Đăng nhập

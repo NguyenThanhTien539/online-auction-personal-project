@@ -19,7 +19,7 @@ export default function RegisterPage() {
 
             <div className="flex flex-col items-center relative z-20 space-y-6">
               {/* Logo */}
-              <div className=" px-8 py-4 rounded-lg flex flex-row items-center space-x-4 mb-1.5">
+              <div className=" px-8 py-4 flex flex-row items-center space-x-4 mb-1.5">
                 <img
                   src={logo}
                   alt="VNA Logo"

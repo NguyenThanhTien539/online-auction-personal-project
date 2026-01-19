@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES6",    //Biên dịch sang ES6
+    "target": "ES6", //Biên dịch sang ES6
     "module": "CommonJS", //Hỗ trợ module của Node.js
     "moduleResolution": "node", //Hỗ trợ import từ node_modules
     "esModuleInterop": true, //Dùng import thay cho require
     "resolveJsonModule": true, //Cho phép import file JSON
-    "strict": true //Bật các kiểm tra nghiêm ngặt
+    "strict": true, //Bật các kiểm tra nghiêm ngặt
+    "baseUrl": ".", // Đặt baseUrl là thư mục hiện tại
+    "paths": {
+      "@/*": ["./*"] // Alias @ trỏ đến root của backend
+    }
   }
 }

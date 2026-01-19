@@ -87,9 +87,9 @@ export default function RegisterForm() {
         },
       )
       .addField(
-        "#terms",
+        "#agree",
         [{ rule: "required", errorMessage: "Bạn phải đồng ý với điều khoản!" }],
-        { errorContainer: "#termsError" },
+        { errorContainer: "#agreeError" },
       )
       .onSuccess((event: any) => {
         const email = event.target.email.value;
@@ -98,7 +98,7 @@ export default function RegisterForm() {
 
         const finalData = {
           email: email,
-          fullName: fullName,
+          full_name : fullName,
           password: password,
         };
 
@@ -213,11 +213,11 @@ export default function RegisterForm() {
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
-                id="terms"
-                name="terms"
+                id="agree"
+                name="agree"
                 className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500"
               />
-              <label htmlFor="terms" className="text-sm text-gray-600">
+              <label htmlFor="agree" className="text-sm text-gray-600">
                 Tôi cam kết tuân thủ quyền và trách nhiệm của người tham gia đấu
                 giá, chính sách và mọi{" "}
                 <a
@@ -232,7 +232,7 @@ export default function RegisterForm() {
 
             {/* Error */}
             <div
-              id="termsError"
+              id="agreeError"
               className="mt-1 text-xs text-red-500 font-medium"
             />
           </div>

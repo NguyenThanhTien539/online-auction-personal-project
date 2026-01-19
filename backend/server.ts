@@ -5,12 +5,21 @@ const port = process.env.PORT || 3000;
 const sever = express();
 dotenv.config();
 
-import { getDb } from "./config/database.config";
+import clientRoutes from "./routes/client/index.route";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
-sever.get("/", async (req, res) => {
-  const user = await getDb()("users").first();
-  res.send(`Hello, ${user ? user.full_name : "Guest"}!`);
-});
+sever.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+
+sever.use(express.json());
+sever.use(cookieParser());
+
+sever.use("/", clientRoutes);
 
 sever.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

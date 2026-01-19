@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <form className="w-300 max-w-xl bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 flex flex-col space-y-6">
@@ -18,11 +20,7 @@ export default function LoginForm() {
       <div className="space-y-4">
         {/* Email hoặc Số điện thoại */}
         <div>
-          <InputField
-            label="Số điện thoại/email"
-            id="phoneOrEmail"
-            placeholder="Nhập số điện thoại hoặc email"
-          />
+          <InputField label="Email" id="email" placeholder="Nhập email" />
         </div>
 
         {/* Mật khẩu */}
@@ -69,12 +67,14 @@ export default function LoginForm() {
       {/* Đăng ký */}
       <div className="text-center text-sm text-gray-600">
         Chưa có tài khoản?{" "}
-        <a
-          href="/accounts/register"
-          className="text-green-600 hover:underline font-medium"
+        <button
+          onClick={() => {
+            navigate("/accounts/register");
+          }}
+          className="cursor-pointer text-green-600 hover:underline font-medium"
         >
           Đăng ký
-        </a>
+        </button>
       </div>
 
       {/* Divider */}

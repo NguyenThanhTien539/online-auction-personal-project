@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
 import JustValidate from "just-validate";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  useEffect(() => { 
+  const navigate = useNavigate();
+  useEffect(() => {
     const validator = new JustValidate("#register-form");
     validator
       .addField(
@@ -28,7 +29,7 @@ export default function RegisterForm() {
         ],
         {
           errorContainer: "#fullNameError",
-        }
+        },
       )
       .addField(
         "#email",
@@ -36,7 +37,7 @@ export default function RegisterForm() {
           { rule: "required", errorMessage: "Vui lòng nhập email!" },
           { rule: "email", errorMessage: "Email không đúng định dạng!" },
         ],
-        { errorContainer: "#emailError" }
+        { errorContainer: "#emailError" },
       )
       .addField(
         "#password",
@@ -65,17 +66,57 @@ export default function RegisterForm() {
         ],
         {
           errorContainer: "#passwordError",
-        }
+        },
+      )
+      .addField(
+        "#confirmPassword",
+        [
+          { rule: "required", errorMessage: "Vui lòng nhập lại mật khẩu!" },
+          {
+            validator: (value: string) => {
+              const password = (
+                document.getElementById("password") as HTMLInputElement
+              )?.value;
+              return value === password;
+            },
+            errorMessage: "Mật khẩu không khớp!",
+          },
+        ],
+        {
+          errorContainer: "#confirmPasswordError",
+        },
       )
       .addField(
         "#terms",
-        [{ rule: "required", errorMessage: "Bạn phải đồng ý với điều khoản" }],
-        { errorContainer: "#termsError" }
+        [{ rule: "required", errorMessage: "Bạn phải đồng ý với điều khoản!" }],
+        { errorContainer: "#termsError" },
       )
       .onSuccess((event: any) => {
-        event.preventDefault();
-        // Xử lý khi form hợp lệ và được submit
-        console.log("Form submitted");
+        const email = event.target.email.value;
+        const fullName = event.target.fullName.value;
+        const password = event.target.password.value;
+
+        const finalData = {
+          email: email,
+          fullName: fullName,
+          password: password,
+        };
+
+        fetch(`${import.meta.env.VITE_API_URL}/api/accounts/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(finalData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.code == "success") {
+              console.log("Registration successful");
+            } else {
+              console.error("Registration failed:", data.message);
+            }
+          });
       });
   }, []);
 
@@ -161,6 +202,10 @@ export default function RegisterForm() {
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            <div
+              id="confirmPasswordError"
+              className="text-xs text-red-500 mt-1 font-medium"
+            ></div>
           </div>
 
           <div className="flex flex-col">
@@ -203,12 +248,14 @@ export default function RegisterForm() {
 
         <div className="text-center text-sm text-gray-600">
           Đã có tài khoản?{" "}
-          <a
-            href="/accounts/login"
-            className="text-green-600 hover:underline font-medium"
+          <button
+            onClick={() => {
+              navigate("/accounts/login");
+            }}
+            className="cursor-pointer text-green-600 hover:underline font-medium"
           >
             Đăng nhập
-          </a>
+          </button>
         </div>
 
         {/* Divider */}

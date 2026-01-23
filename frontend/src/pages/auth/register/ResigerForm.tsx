@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -98,7 +99,7 @@ export default function RegisterForm() {
 
         const finalData = {
           email: email,
-          full_name : fullName,
+          full_name: fullName,
           password: password,
         };
 
@@ -112,9 +113,14 @@ export default function RegisterForm() {
           .then((response) => response.json())
           .then((data) => {
             if (data.code == "success") {
-              console.log("Registration successful");
+              toast.success(data.message);
+              navigate("/accounts/verify-otp?type=register&email=" + email);
+            } else if (data.code == "error") {
+              toast.error(data.message);
+            } else if (data.code == "otp_exist") {
+              toast.error(data.message);
             } else {
-              console.error("Registration failed:", data.message);
+              toast.error("Đã có lỗi xảy ra, vui lòng thử lại sau!");
             }
           });
       });
@@ -241,7 +247,7 @@ export default function RegisterForm() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 rounded-full transition-colors shadow-lg hover:shadow-xl"
+          className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 rounded-full transition-colors shadow-lg hover:shadow-xl"
         >
           Tạo tài khoản
         </button>

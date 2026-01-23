@@ -70,20 +70,18 @@ export default function OtpPage() {
     inputRefs.current[nextIndex]?.focus();
   };
 
-
   const handleResendOtp = () => {
     setCountdown(30);
     setOtp(["", "", "", "", "", ""]);
     inputRefs.current[0]?.focus();
   };
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const otpCode = otp.join("");
 
     if (otpCode.length === 6) {
       console.log("OTP:", otpCode);
-      // Xử lý xác thực OTP ở đây
     }
   };
 

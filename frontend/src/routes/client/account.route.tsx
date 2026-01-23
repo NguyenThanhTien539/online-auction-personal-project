@@ -1,5 +1,6 @@
 import RegisterPage from "@/pages/auth/register/RegisterPage";
 import LoginPage from "@/pages/auth/login/LoginPage";
+import OtpPage from "@/pages/auth/otp/OtpPage";
 
 const accountRoute = {
   path: "/accounts",
@@ -11,6 +12,10 @@ const accountRoute = {
     {
       path: "login",
       element: <LoginPage />,
+    },
+    {
+      path: "verify-otp",
+      element: <OtpPage />,
     },
   ],
 };

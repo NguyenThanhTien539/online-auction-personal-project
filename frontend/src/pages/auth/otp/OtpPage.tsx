@@ -1,17 +1,66 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function OtpPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
 
   const canResend = countdown === 0;
 
+  // Verify OTP token on component mount
   useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+    const verifyToken = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/accounts/verify-otp-token`,
+          {
+            method: "GET",
+            credentials: "include", // Important: send cookies
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.code === "success") {
+          setUserEmail(data.data.email);
+          setIsVerifying(false);
+
+          // Tính toán countdown dựa trên thời gian hết hạn đã lưu
+          const otpExpireTime = localStorage.getItem("otp_expire_time");
+          if (otpExpireTime) {
+            const expireTimestamp = parseInt(otpExpireTime);
+            const currentTime = Date.now();
+            console.log({ expireTimestamp, currentTime });
+            const remainingSeconds = Math.max(
+              0,
+              Math.floor((expireTimestamp - currentTime) / 1000),
+            );
+            setCountdown(remainingSeconds);
+          } else {
+            setCountdown(0);
+          }
+
+          inputRefs.current[0]?.focus();
+        } else {
+          toast.error(`${data.message}. Vui lòng đăng ký lại.`);
+          localStorage.removeItem("otp_expire_time");
+          navigate(-1);
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        toast.error("Đã xảy ra lỗi khi xác thực token OTP.");
+        localStorage.removeItem("otp_expire_time");
+        navigate(-1);
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
 
   useEffect(() => {
     // Đếm ngược 30 giây
@@ -70,10 +119,18 @@ export default function OtpPage() {
     inputRefs.current[nextIndex]?.focus();
   };
 
-  const handleResendOtp = () => {
-    setCountdown(30);
-    setOtp(["", "", "", "", "", ""]);
-    inputRefs.current[0]?.focus();
+  const handleResendOtp = async () => {
+    try {
+      const newExpireTime = Date.now() + 30 * 1000;
+      localStorage.setItem("otp_expire_time", newExpireTime.toString());
+      setCountdown(30);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+      toast.success("Mã OTP mới đã được gửi!");
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      toast.error("Không thể gửi lại mã OTP. Vui lòng thử lại!");
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,6 +142,20 @@ export default function OtpPage() {
     }
   };
 
+  // Show loading state while verifying token
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen bg-green-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Đang xác thực...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen bg-green-100 flex items-center justify-center p-4">
@@ -93,9 +164,10 @@ export default function OtpPage() {
             <h2 className="text-3xl font-bold text-green-500 mb-2">
               Xác thực OTP
             </h2>
-            <p className="text-gray-600">
-              Vui lòng nhập mã OTP gồm 6 số đã được gửi đến email của bạn
+            <p className="text-gray-600 mb-2">
+              Vui lòng nhập mã OTP gồm 6 số đã được gửi đến email:
             </p>
+            <p className="text-green-600 font-semibold">{userEmail}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,7 +223,7 @@ export default function OtpPage() {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => navigate("/auth/login")}
+                onClick={() => navigate("/accounts/login")}
                 className="cursor-pointer text-gray-600 text-sm hover:text-green-500 hover:underline"
               >
                 ← Quay lại đăng nhập

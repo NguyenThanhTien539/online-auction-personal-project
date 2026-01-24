@@ -108,12 +108,22 @@ export default function RegisterForm() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(finalData),
         })
           .then((response) => response.json())
           .then((data) => {
             if (data.code == "success") {
               toast.success(data.message);
+
+              // Lưu thời gian hết hạn OTP vào localStorage
+              if (data.data?.expireTime) {
+                localStorage.setItem(
+                  "otp_expire_time",
+                  data.data.expireTime.toString(),
+                );
+              }
+
               navigate("/accounts/verify-otp?type=register&email=" + email);
             } else if (data.code == "error") {
               toast.error(data.message);

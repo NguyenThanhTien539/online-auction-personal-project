@@ -4,9 +4,11 @@ import jwt from "jsonwebtoken";
 
 import * as accountModel from "../../models/client/account.model";
 import { sendMail } from "@/helper/mail.helper";
+import { otpVerificationContent } from "../../config/mail-content.config";
 
 const LENGTH_OTP_CODE = 6;
-const OTP_EXPIRATION_MINUTES = 1;
+const OTP_TOKEN_EXPIRATION_MINUTES = 1;
+const OTP_CODE_EXPIRATION_MINUTES = 1;
 
 export async function register(req: Request, res: Response) {
   const isExist = await accountModel.isExistingEmail(req.body.email);
@@ -35,40 +37,29 @@ export async function register(req: Request, res: Response) {
     },
     `${process.env.JWT_SECRET_KEY}`,
     {
-      expiresIn: `${OTP_EXPIRATION_MINUTES}m`,
+      expiresIn: `${OTP_TOKEN_EXPIRATION_MINUTES}m`,
     },
   );
-
   res.cookie("verified_otp_token", verified_otp_token, {
-    maxAge: OTP_EXPIRATION_MINUTES * 60 * 1000, //mili giây
+    maxAge: OTP_TOKEN_EXPIRATION_MINUTES * 60 * 1000, //mili giây
     httpOnly: true,
     secure: false, //https sets true and http sets false
     sameSite: "lax", //allow send cookie between domains
   });
 
   const title = "Mã OTP xác nhận đăng ký";
-  const content = `
-    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
-      Xin chào,
-    </p>
-    <p style="font-size: 15px; color: #555; margin-bottom: 20px;">
-      Cảm ơn bạn đã đăng ký tài khoản tại <strong>Online Auction</strong>. 
-      Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã OTP bên dưới:
-    </p>
-    <div class="highlight">
-      ${otpCode}
-    </div>
-    <p style="font-size: 14px; color: #e74c3c; margin-top: 20px;">
-      ⏰ Mã OTP có hiệu lực trong <strong>${OTP_EXPIRATION_MINUTES} phút</strong>
-    </p>
-    <p style="font-size: 14px; color: #555; margin-top: 15px;">
-      ⚠️ <strong>Lưu ý:</strong> Vui lòng không chia sẻ mã OTP này với bất kỳ ai để bảo vệ tài khoản của bạn.
-    </p>
-  `;
-   sendMail(req.body.email, title, content);
+  const content = otpVerificationContent(OTP_TOKEN_EXPIRATION_MINUTES, otpCode);
+
+  sendMail(req.body.email, title, content);
+
+  // Tính thời gian hết hạn (timestamp)
+  const expireTime = Date.now() + 20 * 1000;
 
   res.json({
     code: "success",
     message: "Vui lòng nhập mã OTP",
+    data: {
+      expireTime: expireTime, // Trả về thời gian hết hạn
+    },
   });
 }

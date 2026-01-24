@@ -63,3 +63,22 @@ export async function register(req: Request, res: Response) {
     },
   });
 }
+
+export async function verifyOtpCode(req: Request, res: Response) {
+  const isVerified = await accountModel.verifyOtpCode(
+    req.body.otpTokenData.email,
+    req.body.otp_code,
+  );
+
+  if (!isVerified) {
+    return res.json({
+      code: "error",
+      message: "Mã OTP không đúng. Vui lòng thử lại.",
+    });
+  }
+
+  return res.json({
+    code: "success",
+    message: "Xác thực OTP thành công",
+  });
+}

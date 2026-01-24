@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+const OTP_CODE_EXPIRATION_SECONDS = 20;
+
 export default function OtpPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(0);
@@ -35,7 +37,6 @@ export default function OtpPage() {
           if (otpExpireTime) {
             const expireTimestamp = parseInt(otpExpireTime);
             const currentTime = Date.now();
-            console.log({ expireTimestamp, currentTime });
             const remainingSeconds = Math.max(
               0,
               Math.floor((expireTimestamp - currentTime) / 1000),
@@ -121,9 +122,9 @@ export default function OtpPage() {
 
   const handleResendOtp = async () => {
     try {
-      const newExpireTime = Date.now() + 30 * 1000;
+      const newExpireTime = Date.now() + OTP_CODE_EXPIRATION_SECONDS * 1000;
       localStorage.setItem("otp_expire_time", newExpireTime.toString());
-      setCountdown(30);
+      setCountdown(OTP_CODE_EXPIRATION_SECONDS);
       setOtp(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
       toast.success("Mã OTP mới đã được gửi!");
@@ -138,7 +139,31 @@ export default function OtpPage() {
     const otpCode = otp.join("");
 
     if (otpCode.length === 6) {
-      console.log("OTP:", otpCode);
+      fetch(`${import.meta.env.VITE_API_URL}/api/accounts/verify-otp-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important: send cookies
+        body: JSON.stringify({ otp_code: otpCode }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.code === "success") {
+            toast.success(data.message);
+            navigate("/accounts/login");
+          } else if (data.code === "error") {
+            toast.error(data.message);
+          } else {
+            toast.error(`${data.message}. Vui lòng đăng ký lại.`);
+            localStorage.removeItem("otp_expire_time");
+            navigate(-1);
+          }
+        })
+        .catch((error) => {
+          console.error("Error verifying OTP:", error);
+          toast.error("Đã xảy ra lỗi khi xác thực OTP. Vui lòng thử lại.");
+        });
     }
   };
 

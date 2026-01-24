@@ -13,4 +13,10 @@ router.post(
 
 router.get("/verify-otp-token", otpVerifyMiddleware.checkOtpToken);
 
+router.post(
+  "/verify-otp-code",
+  otpVerifyMiddleware.requireOtpToken,
+  accountController.verifyOtpCode,
+);
+
 export default router;

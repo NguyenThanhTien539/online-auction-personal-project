@@ -25,3 +25,15 @@ export async function saveOtpCode(
     otp_code: otpCode,
   });
 }
+
+export async function verifyOtpCode(
+  email: string,
+  otpCode: string,
+): Promise<boolean> {
+  const db = getDb();
+  const otpRecord = await db("otp_codes")
+    .where({ email, otp_code: Number(otpCode) })
+    .andWhere("otp_expiry", ">", db.fn.now())
+    .first();
+  return !!otpRecord;
+}

@@ -122,7 +122,23 @@ export default function OtpPage() {
 
   const handleResendOtp = async () => {
     try {
-      const newExpireTime = Date.now() + OTP_CODE_EXPIRATION_SECONDS * 1000;
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/accounts/resend-otp-code`,
+        {
+          method: "GET",
+          credentials: "include", // Important: send cookies
+        },
+      );
+      const data = await response.json();
+
+      if (data.code !== "success") {
+        toast.error(
+          data.message || "Không thể gửi lại mã OTP. Vui lòng thử lại!",
+        );
+        return;
+      }
+
+      const newExpireTime = data.data.expireTime;
       localStorage.setItem("otp_expire_time", newExpireTime.toString());
       setCountdown(OTP_CODE_EXPIRATION_SECONDS);
       setOtp(["", "", "", "", "", ""]);

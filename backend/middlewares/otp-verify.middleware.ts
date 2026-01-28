@@ -13,6 +13,8 @@ function decodeOtpToken(req: Request): JwtPayload {
     verified_otp_token,
     `${process.env.JWT_SECRET_KEY}`,
   ) as JwtPayload;
+
+  console.log("Token decoded successfully:", decoded.email);
   return decoded;
 }
 
@@ -65,6 +67,9 @@ export async function requireOtpToken(
   try {
     const decoded = decodeOtpToken(req);
 
+    if (!req.body) {
+      req.body = {};
+    }
     req.body.otpTokenData = decoded;
     next();
   } catch (error: any) {

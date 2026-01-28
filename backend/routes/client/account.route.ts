@@ -19,4 +19,7 @@ router.post(
   accountController.verifyOtpCode,
 );
 
+
+router.get("/resend-otp-code", otpVerifyMiddleware.requireOtpToken, accountController.resendOtpCode);
+
 export default router;

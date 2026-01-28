@@ -6,9 +6,11 @@ import * as accountModel from "../../models/client/account.model";
 import { sendMail } from "@/helper/mail.helper";
 import { otpVerificationContent } from "../../config/mail-content.config";
 
-const LENGTH_OTP_CODE = 6;
-const OTP_TOKEN_EXPIRATION_MINUTES = 1;
-const OTP_CODE_EXPIRATION_MINUTES = 1;
+import {
+  OTP_TOKEN_EXPIRATION_MINUTES,
+  OTP_CODE_EXPIRATION_SECONDS,
+  LENGTH_OTP_CODE,
+} from "../../config/variable.config";
 
 export async function register(req: Request, res: Response) {
   const isExist = await accountModel.isExistingEmail(req.body.email);
@@ -53,7 +55,7 @@ export async function register(req: Request, res: Response) {
   sendMail(req.body.email, title, content);
 
   // Tính thời gian hết hạn (timestamp)
-  const expireTime = Date.now() + 20 * 1000;
+  const expireTime = Date.now() + OTP_CODE_EXPIRATION_SECONDS * 1000;
 
   res.json({
     code: "success",
@@ -80,5 +82,26 @@ export async function verifyOtpCode(req: Request, res: Response) {
   return res.json({
     code: "success",
     message: "Xác thực OTP thành công",
+  });
+}
+
+export async function resendOtpCode(req: Request, res: Response) {
+  console.log("Resend OTP code for:", req.body.otpTokenData.email);
+  const email = req.body.otpTokenData.email;
+  const otpCode = generateOtpCode(LENGTH_OTP_CODE);
+  await accountModel.saveOtpCode(email, otpCode);
+
+  const title = "Mã OTP xác nhận đăng ký";
+  const content = otpVerificationContent(OTP_TOKEN_EXPIRATION_MINUTES, otpCode);
+  sendMail(email, title, content);
+
+  // Tính thời gian hết hạn (timestamp)
+  const expireTime = Date.now() + OTP_CODE_EXPIRATION_SECONDS * 1000;
+  res.json({
+    code: "success",
+    message: "Đã gửi lại mã OTP. Vui lòng kiểm tra email của bạn.",
+    data: {
+      expireTime: expireTime, // Trả về thời gian hết hạn
+    },
   });
 }

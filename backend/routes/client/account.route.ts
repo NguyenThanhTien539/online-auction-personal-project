@@ -27,4 +27,6 @@ router.get(
 
 router.post("/login", accountValidate.login, accountController.login);
 
+router.post("/google-login", accountController.googleLogin);
+
 export default router;

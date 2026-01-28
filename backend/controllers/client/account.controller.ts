@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { generateOtpCode } from "../../helper/generate.helper";
+import { sendMail } from "@/helper/mail.helper";
+import { otpVerificationContent } from "../../config/mail-content.config";
+import { jwtDecode } from "jwt-decode";
+
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import * as accountModel from "../../models/client/account.model";
-import { sendMail } from "@/helper/mail.helper";
-import { otpVerificationContent } from "../../config/mail-content.config";
-import bcrypt from "bcryptjs";
 
 import {
   OTP_TOKEN_EXPIRATION_MINUTES,
@@ -163,14 +165,12 @@ export async function login(req: Request, res: Response) {
     { user_id: user.user_id, email: user.email, role: user.role },
     `${process.env.JWT_SECRET_KEY}`,
     {
-      expiresIn: req.body.rememberPassword ? "3d" : "1d",
+      expiresIn: req.body.rememberMe ? "3d" : "1d",
     },
   );
 
   res.cookie("access_token", accessToken, {
-    maxAge: req.body.rememberPassword
-      ? 3 * 24 * 60 * 60 * 1000
-      : 24 * 60 * 60 * 1000, //mili giây
+    maxAge: req.body.rememberMe ? 3 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000, //mili giây
     httpOnly: true,
     secure: false, //https sets true and http sets false
     sameSite: "lax", //allow send cookie between domains
@@ -179,4 +179,57 @@ export async function login(req: Request, res: Response) {
     code: "success",
     message: "Đăng nhập thành công.",
   });
+}
+
+type GoogleIdTokenPayload = {
+  email: string;
+  name: string;
+  provider_id: string;
+};
+
+export async function googleLogin(req: Request, res: Response) {
+  try {
+    const { credential } = req.body;
+    const infoUser = jwtDecode<any>(credential);
+    const email = infoUser.email;
+    const full_name = infoUser.name;
+    const provider_id = infoUser.sub;
+    let user = await accountModel.getUserByEmail(email);
+
+    if (!user) {
+      const username =
+        email.split("@")[0] + (await accountModel.countTotalUsers()) + 1;
+      const userId = await accountModel.createUserInfo(
+        full_name,
+        username,
+        email,
+      );
+      const provider = "google";
+      await accountModel.createUserAccount(userId, provider, null, provider_id);
+      user = await accountModel.getUserByEmail(email);
+    }
+    const accessToken = jwt.sign(
+      { user_id: user.user_id, email: user.email, role: user.role },
+      `${process.env.JWT_SECRET_KEY}`,
+      {
+        expiresIn: "1d",
+      },
+    );
+    res.cookie("access_token", accessToken, {
+      maxAge: 24 * 60 * 60 * 1000, //mili giây
+      httpOnly: true,
+      secure: false, //https sets true and http sets false
+      sameSite: "lax", //allow send cookie between domains
+    });
+    return res.json({
+      code: "success",
+      message: "Đăng nhập thành công.",
+    });
+  } catch (error) {
+    console.error("Error during Google login:", error);
+    return res.json({
+      code: "error",
+      message: "Đã xảy ra lỗi trong quá trình đăng nhập bằng Google.",
+    });
+  }
 }

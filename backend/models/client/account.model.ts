@@ -42,13 +42,15 @@ export async function getUserByEmail(email: string): Promise<any | null> {
 export async function createUserAccount(
   userId: number,
   provider: string,
-  password_hash: string,
+  password_hash: string | null,
+  provider_uid?: string,
 ): Promise<void> {
   const db = getDb();
   await db("user_auth_providers").insert({
     user_id: userId,
     provider,
     password_hash,
+    provider_uid: provider_uid || null,
   });
 }
 

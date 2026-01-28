@@ -13,7 +13,6 @@ export default function GoogleAuthButton() {
     try {
       const finalData = {
         credential: credentialResponse.credential,
-        rememberPassword: true,
       };
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/accounts/google-login`,

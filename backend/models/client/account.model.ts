@@ -6,6 +6,43 @@ export async function isExistingEmail(email: string): Promise<boolean> {
   return !!existingEmail;
 }
 
+export async function countTotalUsers(): Promise<number> {
+  const db = getDb();
+  const result = await db("users")
+    .count<{ count: number }>("user_id as count")
+    .first();
+  return result ? result.count : 0;
+}
+
+export async function createUserInfo(
+  full_name: string,
+  username: string,
+  email: string,
+): Promise<number> {
+  const db = getDb();
+  const result = await db("users")
+    .insert({
+      full_name,
+      username,
+      email,
+    })
+    .returning("user_id");
+  return result[0].user_id;
+}
+
+export async function createUserAccount(
+  userId: number,
+  provider: string,
+  password_hash: string,
+): Promise<void> {
+  const db = getDb();
+  await db("user_auth_providers").insert({
+    user_id: userId,
+    provider,
+    password_hash,
+  });
+}
+
 export async function existsValidOtpByEmail(email: string): Promise<boolean> {
   const db = getDb();
   const existingOtp = await db("otp_codes")

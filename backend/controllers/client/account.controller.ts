@@ -5,12 +5,28 @@ import jwt from "jsonwebtoken";
 import * as accountModel from "../../models/client/account.model";
 import { sendMail } from "@/helper/mail.helper";
 import { otpVerificationContent } from "../../config/mail-content.config";
+import bcrypt from "bcryptjs";
 
 import {
   OTP_TOKEN_EXPIRATION_MINUTES,
   OTP_CODE_EXPIRATION_SECONDS,
   LENGTH_OTP_CODE,
 } from "../../config/variable.config";
+import { RegisterData } from "@/interface/user.interface";
+
+const SALT_ROUNDS = 10;
+async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+}
+
+async function comparePassword(
+  password: string,
+  hashedPassword: string,
+): Promise<boolean> {
+  return await bcrypt.compare(password, hashedPassword);
+}
 
 export async function register(req: Request, res: Response) {
   const isExist = await accountModel.isExistingEmail(req.body.email);
@@ -35,7 +51,8 @@ export async function register(req: Request, res: Response) {
   const verified_otp_token = jwt.sign(
     {
       email: req.body.email,
-      otp_code: otpCode,
+      full_name: req.body.full_name,
+      password: req.body.password,
     },
     `${process.env.JWT_SECRET_KEY}`,
     {
@@ -66,6 +83,19 @@ export async function register(req: Request, res: Response) {
   });
 }
 
+async function createNewUser(registerData: RegisterData) {
+  const { full_name, email, password } = registerData;
+
+  //create default username from email
+  const username =
+    email.split("@")[0] + (await accountModel.countTotalUsers()) + 1;
+
+  const userId = await accountModel.createUserInfo(full_name, username, email);
+  const provider = "local";
+  const password_hash = await hashPassword(password);
+  await accountModel.createUserAccount(userId, provider, password_hash);
+}
+
 export async function verifyOtpCode(req: Request, res: Response) {
   const isVerified = await accountModel.verifyOtpCode(
     req.body.otpTokenData.email,
@@ -77,6 +107,10 @@ export async function verifyOtpCode(req: Request, res: Response) {
       code: "error",
       message: "Mã OTP không đúng. Vui lòng thử lại.",
     });
+  }
+
+  if (req.body.type === "register") {
+    await createNewUser(req.body.otpTokenData);
   }
 
   return res.json({

@@ -14,7 +14,6 @@ function decodeOtpToken(req: Request): JwtPayload {
     `${process.env.JWT_SECRET_KEY}`,
   ) as JwtPayload;
 
-  console.log("Token decoded successfully:", decoded.email);
   return decoded;
 }
 

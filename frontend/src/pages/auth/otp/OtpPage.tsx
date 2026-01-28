@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const OTP_CODE_EXPIRATION_SECONDS = 20;
@@ -11,7 +11,8 @@ export default function OtpPage() {
   const [isVerifying, setIsVerifying] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
-
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type") || "register";
   const canResend = countdown === 0;
 
   // Verify OTP token on component mount
@@ -161,7 +162,7 @@ export default function OtpPage() {
           "Content-Type": "application/json",
         },
         credentials: "include", // Important: send cookies
-        body: JSON.stringify({ otp_code: otpCode }),
+        body: JSON.stringify({ otp_code: otpCode, type: type }),
       })
         .then((response) => response.json())
         .then((data) => {

@@ -57,3 +57,31 @@ export function registerPost(req: Request, res: Response, next: NextFunction) {
 
   next();
 }
+
+export function login(req: Request, res: Response, next: NextFunction) {
+  const schema = Joi.object({
+    email: Joi.string().email().required().messages({
+      "string.empty": "Vui lòng nhập email của bạn!",
+      "string.email": "Email không đúng định dạng!",
+    }),
+    password: Joi.string().required().min(8).messages({
+      "string.empty": "Vui lòng nhập mật khẩu!",
+      "string.min": "Mật khẩu phải ít nhất 8 ký tự!",
+    }),
+    rememberPassword: Joi.boolean().allow(""), // Cho phép boolean hoặc để trống,
+    // captchaToken: Joi.string().required().messages({
+    //   "string.empty": "Captcha token is required!",
+    // }),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    const errorMessage = error.details[0].message;
+    return res.json({
+      code: "error",
+      message: errorMessage,
+    });
+  }
+
+  next();
+}

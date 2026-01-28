@@ -113,9 +113,10 @@ export async function verifyOtpCode(req: Request, res: Response) {
     await createNewUser(req.body.otpTokenData);
   }
 
+  res.clearCookie("verified_otp_token");
   return res.json({
     code: "success",
-    message: "Xác thực OTP thành công",
+    message: "Xác thực OTP thành công. Vui lòng đăng nhập.",
   });
 }
 
@@ -137,5 +138,45 @@ export async function resendOtpCode(req: Request, res: Response) {
     data: {
       expireTime: expireTime, // Trả về thời gian hết hạn
     },
+  });
+}
+
+export async function login(req: Request, res: Response) {
+  const { email, password } = req.body;
+  const user = await accountModel.getUserByEmail(email);
+
+  if (!user) {
+    return res.json({
+      code: "error",
+      message: "Email không tồn tại trong hệ thống.",
+    });
+  }
+  const isPasswordValid = await comparePassword(password, user.password_hash);
+  if (!isPasswordValid) {
+    return res.json({
+      code: "error",
+      message: "Mật khẩu không đúng.",
+    });
+  }
+
+  const accessToken = jwt.sign(
+    { user_id: user.user_id, email: user.email, role: user.role },
+    `${process.env.JWT_SECRET_KEY}`,
+    {
+      expiresIn: req.body.rememberPassword ? "3d" : "1d",
+    },
+  );
+
+  res.cookie("access_token", accessToken, {
+    maxAge: req.body.rememberPassword
+      ? 3 * 24 * 60 * 60 * 1000
+      : 24 * 60 * 60 * 1000, //mili giây
+    httpOnly: true,
+    secure: false, //https sets true and http sets false
+    sameSite: "lax", //allow send cookie between domains
+  });
+  return res.json({
+    code: "success",
+    message: "Đăng nhập thành công.",
   });
 }

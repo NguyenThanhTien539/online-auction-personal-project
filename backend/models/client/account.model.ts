@@ -30,6 +30,15 @@ export async function createUserInfo(
   return result[0].user_id;
 }
 
+export async function getUserByEmail(email: string): Promise<any | null> {
+  const db = getDb();
+  const user = await db("users")
+    .where({ email })
+    .join("user_auth_providers", "users.user_id", "user_auth_providers.user_id")
+    .first();
+  return user || null;
+}
+
 export async function createUserAccount(
   userId: number,
   provider: string,

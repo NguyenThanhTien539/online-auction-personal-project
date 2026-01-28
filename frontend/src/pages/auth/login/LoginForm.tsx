@@ -1,14 +1,73 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
 import { useNavigate } from "react-router-dom";
-
+import JustValidate from "just-validate";
+import { toast } from "sonner";
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const validator = new JustValidate("#login-form");
+
+    validator
+      .addField("#email", [
+        {
+          rule: "required",
+          errorMessage: "Vui lòng nhập email",
+        },
+        {
+          rule: "email",
+          errorMessage: "Email không hợp lệ",
+        },
+      ])
+      .addField("#password", [
+        {
+          rule: "required",
+          errorMessage: "Vui lòng nhập mật khẩu",
+        },
+      ])
+      .onSuccess((event: any) => {
+        // Handle form submission here
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+        const rememberPassword = event.target.rememberPassword.checked;
+        const finalData = {
+          email: email,
+          password: password,
+          rememberPassword: rememberPassword,
+        };
+
+        fetch(`${import.meta.env.VITE_API_URL}/api/accounts/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Important: send cookies
+          body: JSON.stringify(finalData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.code === "success") {
+              toast.success(data.message);
+              navigate("/"); // Redirect to home page on successful login
+            } else {
+              toast.error(data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error during login:", error);
+          });
+      });
+  }, []);
+
   return (
-    <form className="w-300 max-w-xl bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 flex flex-col space-y-6">
+    <form
+      id="login-form"
+      className="w-300 max-w-xl bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 flex flex-col space-y-6"
+    >
       {/* Title */}
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-semibold text-gray-800">
@@ -45,8 +104,17 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {/* Quên mật khẩu */}
+        {/* Nhớ mật khẩu và Quên mật khẩu */}
         <div className="flex justify-between items-center text-sm">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              id="rememberPassword"
+              name="rememberPassword"
+              className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+            />
+            <span className="text-gray-700">Nhớ mật khẩu</span>
+          </label>
           <a
             href="/forgot-password"
             className="text-gray-700 hover:text-green-600 font-medium"

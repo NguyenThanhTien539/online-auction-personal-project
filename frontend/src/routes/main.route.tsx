@@ -1,7 +1,7 @@
-  import { createBrowserRouter } from "react-router-dom";
-  import homeRoute from "@/routes/client/home.route";
-  import accountRoute from "@/routes/client/account.route";
+import { createBrowserRouter } from "react-router-dom";
+import clientRoutes from "@/routes/client/index.route";
+import adminRoutes from "@/routes/admin/index.route";
 
-  const router = createBrowserRouter([homeRoute, accountRoute]);
+const router = createBrowserRouter([clientRoutes, adminRoutes]);
 
-  export default router;
+export default router;

@@ -1,7 +1,7 @@
 import Home from "@/views/client/pages/Home";
 
 const homeRoute = {
-  path: "/",
+  path: "",
   element: <Home />,
 };
 

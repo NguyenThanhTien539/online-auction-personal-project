@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "@/views/admin/partials/Header";
-import Sidebar from "@/components/admin/Sidebar";
+import Sidebar from "@/views/admin/partials/Sidebar";
 
 export default function DefaultLayout() {
   return (

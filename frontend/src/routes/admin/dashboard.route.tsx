@@ -1,8 +1,8 @@
-import Header from "@/views/admin/partials/Header";
+import Dashboard from "@/views/admin/pages/Dashboard";
 
 const dashboardRoute = {
   path: "dashboard",
-  element: <Header />,
+  element: <Dashboard />,
 };
 
 export default dashboardRoute;

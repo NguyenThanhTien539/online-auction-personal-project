@@ -20,6 +20,6 @@ createRoot(document.getElementById("root")!).render(
         },
       }}
     />
-    <RouterProvider router={routers} />,
+    <RouterProvider router={routers} />
   </>,
 );

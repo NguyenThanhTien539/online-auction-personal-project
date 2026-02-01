@@ -1,10 +1,11 @@
 import DefaultLayout from "@/views/admin/layouts/Default";
-import dashboardRoute from "./dashboard.route";
+import dashboardRoutes from "./dashboard.route";
+import categoryRoutes from "./category.route";
 
 const adminRoute = {
   path: "/admin",
   element: <DefaultLayout />,
-  children: [dashboardRoute],
+  children: [dashboardRoutes, categoryRoutes],
 };
 
 export default adminRoute;

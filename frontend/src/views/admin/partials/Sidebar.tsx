@@ -11,13 +11,13 @@ import {
 
 const menuItems = [
   {
-    title: "Dashboard",
+    title: "Tổng quan",
     path: `/${path_admin}/dashboard`,
     icon: LayoutDashboard,
   },
   {
-    title: "Users",
-    path: `/${path_admin}/users`,
+    title: "Quản lý danh mục",
+    path: `/${path_admin}/categories`,
     icon: Users,
   },
   {

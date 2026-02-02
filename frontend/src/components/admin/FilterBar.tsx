@@ -1,4 +1,5 @@
 import { FilterIcon, UndoIcon, Search } from "lucide-react";
+import CreateButton from "../common/CreateButtons";
 
 export default function FilterBar() {
   return (
@@ -78,6 +79,9 @@ export default function FilterBar() {
               size={25}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900"
             />
+          </div>
+          <div>
+            <CreateButton />
           </div>
         </div>
       </div>

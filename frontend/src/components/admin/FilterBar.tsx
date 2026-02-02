@@ -1,5 +1,5 @@
 import { FilterIcon, UndoIcon, Search } from "lucide-react";
-import CreateButton from "../common/CreateButtons";
+import { CreateButton } from "@/components/common/Buttons";
 
 export default function FilterBar() {
   return (

@@ -20,9 +20,7 @@ export default function CategoryList() {
               <th className="px-4 py-3 text-left font-medium text-gray-700">
                 Ảnh đại diện
               </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Vị trí
-              </th>
+
               <th className="px-4 py-3 text-left font-medium text-gray-700">
                 Trạng thái
               </th>
@@ -52,7 +50,6 @@ export default function CategoryList() {
                   className="w-10 h-10 rounded-lg object-cover"
                 />
               </td>
-              <td className="px-4 py-4 text-gray-600">2</td>
               <td className="px-4 py-4">
                 <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
                   Hoạt động
@@ -95,7 +92,6 @@ export default function CategoryList() {
                   className="w-10 h-10 rounded-lg object-cover"
                 />
               </td>
-              <td className="px-4 py-4 text-gray-600">2</td>
               <td className="px-4 py-4">
                 <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
                   Hoạt động

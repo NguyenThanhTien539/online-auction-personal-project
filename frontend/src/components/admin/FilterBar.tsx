@@ -1,6 +1,6 @@
 import { FilterIcon, UndoIcon, Search } from "lucide-react";
 import { CreateButton } from "@/components/common/Buttons";
-
+import { path_admin } from "@/configs/variable.config";
 export default function FilterBar() {
   return (
     <>
@@ -81,7 +81,7 @@ export default function FilterBar() {
             />
           </div>
           <div>
-            <CreateButton />
+            <CreateButton url={`/${path_admin}/categories/create`} />
           </div>
         </div>
       </div>

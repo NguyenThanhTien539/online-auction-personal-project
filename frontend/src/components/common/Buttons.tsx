@@ -1,11 +1,20 @@
 import { Edit } from "lucide-react";
 import { Trash2 } from "lucide-react";
-export function CreateButton() {
+import { Link } from "react-router-dom";
+
+type CreateButtonProps = {
+  url: string;
+};
+
+export function CreateButton({ url }: CreateButtonProps) {
   return (
     <>
-      <button className="border border-blue-500 bg-blue-500 rounded-xl px-7 py-5 cursor-pointer hover:bg-blue-600">
+      <Link
+        className="border border-blue-500 bg-blue-500 rounded-xl px-7 py-5 cursor-pointer hover:bg-blue-600"
+        to={url}
+      >
         <span className="text-white font-semibold">+ Tạo mới</span>
-      </button>
+      </Link>
     </>
   );
 }

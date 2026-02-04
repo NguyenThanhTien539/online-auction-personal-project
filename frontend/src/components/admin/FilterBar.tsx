@@ -81,7 +81,10 @@ export default function FilterBar() {
             />
           </div>
           <div>
-            <CreateButton url={`/${path_admin}/categories/create`} />
+            <CreateButton
+              url={`/${path_admin}/categories/create`}
+              name="+ Tạo mới"
+            />
           </div>
         </div>
       </div>

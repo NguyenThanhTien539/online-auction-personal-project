@@ -43,7 +43,7 @@ export default function CategoryList() {
               <td className="px-4 py-4 font-medium text-gray-900">
                 Tour nước ngoài
               </td>
-              <td className="px-4 py-4">
+              <td className="px-4 py-4 ">
                 <img
                   src={avatar}
                   alt=""

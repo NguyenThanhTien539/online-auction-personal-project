@@ -1,8 +1,19 @@
 import FilterBar from "@/components/admin/FilterBar";
 import avatar from "@/assets/image/avatar.jpg";
 import { DeleteButton, EditButton } from "@/components/common/Buttons";
+import Pagination from "@/components/common/Pagination";
+import { useSearchParams } from "react-router-dom";
 
 export default function CategoryList() {
+  const totalPages = 10;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+
+  const handlePageChange = (page: number) => {
+    //set param page or call API
+    setSearchParams({ page: page.toString() });
+  };
+
   return (
     <div className="w-full space-y-6">
       <h1 className="font-medium text-3xl">Quản lý danh mục</h1>
@@ -123,6 +134,11 @@ export default function CategoryList() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }

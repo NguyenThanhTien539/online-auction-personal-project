@@ -21,7 +21,7 @@ const menuItems = [
     icon: Users,
   },
   {
-    title: "Products",
+    title: "Quản lý sản phẩm",
     path: `/${path_admin}/products`,
     icon: Package,
   },

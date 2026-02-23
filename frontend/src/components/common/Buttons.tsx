@@ -1,5 +1,4 @@
-import { Edit } from "lucide-react";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type CreateButtonProps = {
@@ -35,6 +34,15 @@ export function DeleteButton() {
     <>
       <button>
         <Trash2 size={18} className="text-red-600 cursor-pointer" />
+      </button>
+    </>
+  );
+}
+export function EyeButton() {
+  return (
+    <>
+      <button>
+        <Eye size={18} className="text-blue-600 cursor-pointer" />
       </button>
     </>
   );

@@ -17,7 +17,12 @@ export default function CategoryList() {
   return (
     <div className="w-full space-y-6">
       <h1 className="font-medium text-3xl">Quản lý danh mục</h1>
-      <FilterBar />
+      <FilterBar
+        isShowDateFilter={true}
+        isShowCreateButton={true}
+        createButtonText="+ Tạo mới"
+        createUrl="/admin/categories/create"
+      />
       <div className="bg-white border border-gray-300  rounded-lg shadow overflow-hidden">
         <table className="w-full ">
           <thead className="bg-gray-50 border-b border-gray-300">

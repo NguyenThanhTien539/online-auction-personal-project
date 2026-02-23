@@ -1,11 +1,41 @@
 import { FilterIcon, UndoIcon, Search } from "lucide-react";
 import { CreateButton } from "@/components/common/Buttons";
 import { path_admin } from "@/configs/variable.config";
-export default function FilterBar() {
+
+interface StatusOption {
+  value: string;
+  label: string;
+}
+
+interface FilterBarProps {
+  statusOptions?: StatusOption[];
+  createByOptions?: StatusOption[];
+  isShowDateFilter: boolean;
+  isShowCreateButton: boolean;
+  createButtonText?: string;
+  createUrl?  : string;
+}
+
+export default function FilterBar({
+  statusOptions = [
+    { value: "all", label: "Trạng thái" },
+    { value: "active", label: "Hoạt động" },
+    { value: "inactive", label: "Tạm dừng" },
+  ],
+  isShowDateFilter = true,
+  isShowCreateButton = false,
+  createButtonText = "+ Tạo mới",
+  createUrl = path_admin + "/create",
+  createByOptions = [
+    { value: "all", label: "Người tạo" },
+    { value: "admin", label: "Admin" },
+    { value: "user", label: "Người dùng" },
+  ],
+}: FilterBarProps) {
   return (
     <>
       <div className="space-y-5">
-        <div className="w-[900px] flex items-stretch justify-start bg-white border border-gray-300 rounded-xl text-gray-800 font-semibold">
+        <div className="w-fit flex items-stretch justify-start bg-white border border-gray-300 rounded-xl text-gray-800 font-semibold">
           <div className="flex items-center gap-2 text-lg  border-r border-gray-300 px-4 py-4">
             <FilterIcon size={20} className="text-gray-800" />
             <span>Bộ lọc</span>
@@ -16,9 +46,11 @@ export default function FilterBar() {
               id="status"
               className=" bg-white px-2 rounded outline-none cursor-pointer"
             >
-              <option value="all">Trạng thái</option>
-              <option value="active">Hoạt động</option>
-              <option value="inactive">Tạm dừng</option>
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex items-center border-r border-gray-300 px-4 py-4">
@@ -27,23 +59,27 @@ export default function FilterBar() {
               id="create_by"
               className=" bg-white px-2 rounded outline-none cursor-pointer"
             >
-              <option value="all">Người tạo</option>
-              <option value="admin">Admin</option>
-              <option value="user">Người dùng</option>
+              {createByOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
-          <div className="flex items-center border-r border-gray-300 gap-2 px-4 py-4 outline-none">
-            {/* date picker */}
-            <input
-              type="date"
-              className="bg-white cursor-pointer [&::-webkit-calendar-picker-indicator]:ml-[-15px] px-2"
-            />
-            <span>-</span>
-            <input
-              type="date"
-              className="bg-white cursor-pointer [&::-webkit-calendar-picker-indicator]:ml-[-15px] px-2"
-            />
-          </div>
+          {isShowDateFilter && (
+            <div className="flex items-center border-r border-gray-300 gap-2 px-4 py-4 outline-none">
+              {/* date picker */}
+              <input
+                type="date"
+                className="bg-white cursor-pointer [&::-webkit-calendar-picker-indicator]:ml-[-15px] px-2"
+              />
+              <span>-</span>
+              <input
+                type="date"
+                className="bg-white cursor-pointer [&::-webkit-calendar-picker-indicator]:ml-[-15px] px-2"
+              />
+            </div>
+          )}
           <div className="flex items-center px-2 py-4">
             <button className="flex items-center gap-2 text-red-600 font-semibold px-2 py-1 rounded cursor-pointer ">
               <UndoIcon size={20} className="text-red-600" />
@@ -80,12 +116,14 @@ export default function FilterBar() {
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900"
             />
           </div>
-          <div>
-            <CreateButton
-              url={`/${path_admin}/categories/create`}
-              name="+ Tạo mới"
-            />
-          </div>
+
+          {isShowCreateButton && (
+            <>
+              <div>
+                <CreateButton url={createUrl} name={createButtonText} />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

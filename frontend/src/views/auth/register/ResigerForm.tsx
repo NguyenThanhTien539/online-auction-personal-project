@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { InputField } from "@/components/common/InputFiled";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import GoogleAuthButton from "../GoogleAuthButton";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const navigate = useNavigate();
   useEffect(() => {
     const validator = new JustValidate("#register-form");
@@ -93,6 +96,18 @@ export default function RegisterForm() {
         [{ rule: "required", errorMessage: "Bạn phải đồng ý với điều khoản!" }],
         { errorContainer: "#agreeError" },
       )
+      .addField(
+        "#recaptcha",
+        [
+          {
+            validator: () => {
+              return recaptchaValue !== null && recaptchaValue !== "";
+            },
+            errorMessage: "Vui lòng xác minh bạn không phải robot!",
+          },
+        ],
+        { errorContainer: "#recaptchaError" },
+      )
       .onSuccess((event: any) => {
         const email = event.target.email.value;
         const fullName = event.target.fullName.value;
@@ -102,7 +117,11 @@ export default function RegisterForm() {
           email: email,
           full_name: fullName,
           password: password,
+          recaptcha: recaptchaValue,
         };
+
+        console.log("Form submission - finalData:", finalData);
+        console.log("reCAPTCHA value before submit:", recaptchaValue);
 
         fetch(`${import.meta.env.VITE_API_URL}/api/accounts/register`, {
           method: "POST",
@@ -128,14 +147,29 @@ export default function RegisterForm() {
               navigate("/accounts/verify-otp?type=register&email=" + email);
             } else if (data.code == "error") {
               toast.error(data.message);
+              // Reset reCAPTCHA khi có lỗi
+              recaptchaRef.current?.reset();
+              setRecaptchaValue(null);
             } else if (data.code == "otp_exist") {
               toast.error(data.message);
+              // Reset reCAPTCHA khi có lỗi
+              recaptchaRef.current?.reset();
+              setRecaptchaValue(null);
             } else {
               toast.error("Đã có lỗi xảy ra, vui lòng thử lại sau!");
+              // Reset reCAPTCHA khi có lỗi
+              recaptchaRef.current?.reset();
+              setRecaptchaValue(null);
             }
+          })
+          .catch(() => {
+            toast.error("Lỗi kết nối! Vui lòng thử lại sau.");
+            // Reset reCAPTCHA khi có lỗi
+            recaptchaRef.current?.reset();
+            setRecaptchaValue(null);
           });
       });
-  }, []);
+  }, [navigate, recaptchaValue]);
 
   return (
     <>
@@ -252,6 +286,28 @@ export default function RegisterForm() {
               id="agreeError"
               className="mt-1 text-xs text-red-500 font-medium"
             />
+          </div>
+
+          {/* reCAPTCHA */}
+          <div>
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+              onChange={(value) => setRecaptchaValue(value)}
+              onExpired={() => setRecaptchaValue(null)}
+            />
+            {/* Hidden input for validation */}
+            <input
+              type="hidden"
+              id="recaptcha"
+              name="recaptcha"
+              value={recaptchaValue || ""}
+              onChange={() => {}} // Prevent React warning
+            />
+            <div
+              id="recaptchaError"
+              className="text-xs text-red-500 mt-1 font-medium text-center"
+            ></div>
           </div>
         </div>
 

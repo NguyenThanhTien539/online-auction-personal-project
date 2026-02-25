@@ -31,6 +31,29 @@ async function comparePassword(
 }
 
 export async function register(req: Request, res: Response) {
+  const recaptcha = req.body.recaptcha;
+  console.log("Received reCAPTCHA token:", recaptcha);
+  if (!recaptcha) {
+    return res.json({
+      code: "error",
+      message: "Vui lòng xác minh bạn không phải robot!",
+    });
+  }
+
+  const captchaVerify = await fetch(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
+    {
+      method: "POST",
+    },
+  ).then((res) => res.json());
+
+  if (!captchaVerify.success) {
+    return res.json({
+      code: "error",
+      message: "Xác thực captcha thất bại!",
+    });
+  }
+
   const isExist = await accountModel.isExistingEmail(req.body.email);
 
   if (isExist) {

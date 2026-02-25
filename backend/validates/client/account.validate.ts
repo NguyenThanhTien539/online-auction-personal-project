@@ -44,6 +44,12 @@ export function registerPost(req: Request, res: Response, next: NextFunction) {
     agree: Joi.boolean().valid(true).messages({
       "any.only": "Bạn phải đồng ý với các điều khoản và điều kiện!",
     }),
+
+    recaptcha: Joi.string().min(1).required().messages({
+      "string.empty": "Vui lòng xác minh bạn không phải robot!",
+      "string.min": "Vui lòng xác minh bạn không phải robot!",
+      "any.required": "Vui lòng xác minh bạn không phải robot!",
+    }),
   });
 
   const { error } = schema.validate(req.body);

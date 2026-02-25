@@ -32,7 +32,6 @@ async function comparePassword(
 
 export async function register(req: Request, res: Response) {
   const recaptcha = req.body.recaptcha;
-  console.log("Received reCAPTCHA token:", recaptcha);
   if (!recaptcha) {
     return res.json({
       code: "error",
@@ -41,7 +40,7 @@ export async function register(req: Request, res: Response) {
   }
 
   const captchaVerify = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
+    `${process.env.RECAPTCHA_GOOGLE_URL}?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
     {
       method: "POST",
     },

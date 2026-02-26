@@ -1,5 +1,5 @@
 import { FilterIcon, UndoIcon, Search } from "lucide-react";
-import { CreateButton } from "@/components/common/Buttons";
+import { CreateButton } from "@/common/Buttons";
 import { path_admin } from "@/configs/variable.config";
 
 interface StatusOption {
@@ -13,7 +13,7 @@ interface FilterBarProps {
   isShowDateFilter: boolean;
   isShowCreateButton: boolean;
   createButtonText?: string;
-  createUrl?  : string;
+  createUrl?: string;
 }
 
 export default function FilterBar({

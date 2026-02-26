@@ -1,4 +1,4 @@
-import TinyMCE from "@/components/common/TinyMCE";
+import TinyMCE from "@/common/TinyMCE";
 import { path_admin } from "@/configs/variable.config";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";

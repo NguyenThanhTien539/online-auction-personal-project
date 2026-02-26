@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { InputField } from "@/components/common/InputFiled";
+import { InputField } from "@/common/InputFiled";
 import { useNavigate } from "react-router-dom";
 import JustValidate from "just-validate";
 import { toast } from "sonner";

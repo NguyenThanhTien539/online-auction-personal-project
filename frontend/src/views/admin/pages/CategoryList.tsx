@@ -1,7 +1,7 @@
-import FilterBar from "@/components/admin/FilterBar";
+import FilterBar from "@/views/admin/components/FilterBar";
 import avatar from "@/assets/image/avatar.jpg";
-import { DeleteButton, EditButton } from "@/components/common/Buttons";
-import Pagination from "@/components/common/Pagination";
+import { DeleteButton, EditButton } from "@/common/Buttons";
+import Pagination from "@/common/Pagination";
 import { useSearchParams } from "react-router-dom";
 
 export default function CategoryList() {

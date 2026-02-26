@@ -1,10 +1,6 @@
-import FilterBar from "@/components/admin/FilterBar";
-import {
-  DeleteButton,
-  EditButton,
-  EyeButton,
-} from "@/components/common/Buttons";
-import Pagination from "@/components/common/Pagination";
+import FilterBar from "@/views/admin/components/FilterBar";
+import { DeleteButton, EditButton, EyeButton } from "@/common/Buttons";
+import Pagination from "@/common/Pagination";
 import { useSearchParams } from "react-router-dom";
 
 const statusOptions = [

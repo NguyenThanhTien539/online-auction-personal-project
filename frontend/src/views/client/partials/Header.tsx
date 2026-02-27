@@ -2,6 +2,7 @@ import { User, ShoppingCart, MapPin, ChevronRight } from "lucide-react";
 import logo from "@/assets/image/auction-logo.svg";
 import CategoryMenu from "@/views/client/components/header/CategoryMenu";
 import SearchBar from "@/views/client/components/header/SearchBar";
+import { Link } from "react-router-dom";
 export default function Header() {
   return (
     <header className="bg-blue-300 border-b border-gray-200 shadow-sm">
@@ -27,10 +28,13 @@ export default function Header() {
 
         {/* Right nav */}
         <nav className="flex items-center gap-2 ml-5 shrink-0">
-          <button className="flex items-center gap-2 text-white rounded-full px-4 py-2 hover:bg-blue-500 hover:border-blue-500 transition-colors duration-200">
+          <Link
+            to={"/accounts/login"}
+            className="flex items-center gap-2 text-white rounded-full px-4 py-2 hover:bg-blue-500 hover:border-blue-500 transition-colors duration-200"
+          >
             <User className="w-5 h-5" />
             <span className="text-sm font-medium">Đăng nhập</span>
-          </button>
+          </Link>
           <button className="flex items-center gap-2 text-white rounded-full px-4 py-2 hover:bg-blue-500 hover:border-blue-500 transition-colors duration-200 relative">
             <ShoppingCart className="w-5 h-5" />
             <span className="text-sm font-medium">Giỏ hàng</span>

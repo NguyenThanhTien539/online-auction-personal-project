@@ -14,7 +14,7 @@ export default function Header() {
             alt="Auction Logo"
             className="cursor-pointer h-13 w-auto hover:opacity-75 hover:rotate-12 transition-all duration-300"
           />
-          <h1 className="text-lg font-bold cursor-pointer text-gray-400 hover:text-blue-700 transition-colors duration-300 hidden sm:block">
+          <h1 className="text-lg font-bold cursor-pointer text-gray-400 hover:text-gray-500 transition-colors duration-300 hidden sm:block">
             Online-Auction
           </h1>
         </div>

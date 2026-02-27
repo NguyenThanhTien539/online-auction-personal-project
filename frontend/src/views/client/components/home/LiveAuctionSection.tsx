@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useInView } from "@/hooks/useInView";
+
 import AuctionCard from "./AuctionCard";
 
 const mockAuctions = [
@@ -40,23 +41,7 @@ const mockAuctions = [
 ];
 
 export default function LiveAuctionSection() {
-  const [visible, setVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(entry.isIntersecting);
-      },
-      { threshold: 0.2 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { ref: sectionRef, isVisible: visible } = useInView(0.2);
 
   return (
     <section

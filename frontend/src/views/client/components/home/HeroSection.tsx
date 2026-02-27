@@ -1,25 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import BannerSlide from "./BannerSlide";
-
+import { useInView } from "@/hooks/useInView";
 export default function HeroSection() {
-  const [visible, setVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(entry.isIntersecting);
-      },
-      { threshold: 0.2 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
+  const { ref: sectionRef, isVisible: visible } = useInView(0.2);
   return (
     <section>
       <div
